@@ -1,0 +1,86 @@
+table, tr, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 20px;
+}
+
+#title{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size:50px;
+}
+.login,#layout{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#join,#money,#bet{
+    text-align: center;
+    margin: auto;
+}
+.loginInfo{
+    margin: 10px;
+}
+form{
+    background-color: green;
+    width: 30%;
+    padding: 20px 10px 50px 10px;
+    margin:auto;
+    color:white;
+}
+#join{
+    background-color: green;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+#deal{
+    background-color: red;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+#stay{
+    background-color: blue;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+#Over{
+    padding: 10px;
+    text-align: center;
+    margin: auto;
+    border: 2px black;
+}
+
+#cardTable{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding: 20px;
+}
+#split{
+    background-color: orangered;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+#tisYourTurn{
+    background-color: blue;
+    color: aliceblue;
+    padding: 15px 25px;
+    font-size: 16px;
+}

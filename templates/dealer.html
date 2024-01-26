@@ -1,0 +1,293 @@
+<html>
+    <head>
+        <title>Dealer</title>
+        <link href="/static/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1 id="title">Blackjack</h1>
+        <div id="Over">
+            <h2 id="gameOver"></h2>
+            <h2 id="burst"></h2>
+            
+            <a href="playAgain"><button id="playAgain" type="submit" name="playAgain" value="playAgain">Play Again?</button></a>
+            <a href="logout"><button id="logout" type="submit" name="logout" value="logout">Logout</button></a>
+        </div>
+        
+        <div id="layout">
+            <button id="join" type="submit" name="join" value="join">Join Table</button>
+            <h1 id="<User 2>.money"></h1>
+            <h1 id="<User 3>.money"></h1>
+            <h1 id="<User 4>.money"></h1>
+            <h1 id="<User 5>.money"></h1>
+            <h1 id="<User 6>.money"></h1>
+            <h2 id="tisYourTurn">Your Turn</h2>
+            <input id="money" type="number" min="1">
+            <button id="bet" type="submit" name="bet" value="bet">Bet</button>
+            <button id="deal" type="submit" name="deal" value="deal">Hit</button>
+            <button id="stay" type="submit" name="stay" value="stay">Stay</button>
+            <button id="split" type="submit" name="split" value="split">Split</button>
+            <br>
+
+            <table id="cardTable">
+                <tr>
+                    <td>
+                        <h2 id="dealerTotal"></h2>
+                        <h2>Dealer:</h2>
+                        <div id="dealerCards"></div>
+                    </td>
+                    <td>
+                         <h2 id="<User 2>.total"></h2>
+                        <div id="<User 2>"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 2>.1.total"></h2>
+                        <div id="<User 2>.1"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2 id="<User 3>.total"></h2>
+                        <div id="<User 3>"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 3>.1.total"></h2>
+                        <div id="<User 3>.1"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 4>.total"></h2>
+                        <div id="<User 4>"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 4>.1.total"></h2>
+                        <div id="<User 4>.1"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2 id="<User 5>.total"></h2>
+                        <div id="<User 5>"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 5>.1.total"></h2>
+                        <div id="<User 5>.1"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 6>.total"></h2>
+                        <div class="<User 6>"></div>
+                    </td>
+                    <td>
+                        <h2 id="<User 6>.1.total"></h2>
+                        <div id="<User 6>.1"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+        <script type="text/javascript" charset="utf-8">
+            var socket = io();
+
+            document.getElementById("tisYourTurn").hidden = true;
+            document.getElementById("deal").hidden = true;
+            document.getElementById("deal").disabled = true;
+            document.getElementById("stay").disabled = true;
+            document.getElementById("stay").hidden = true;
+            document.getElementById("split").hidden = true;
+            
+            document.getElementById("bet").hidden = true;
+            document.getElementById("money").hidden = true;
+            document.getElementById("cardTable").hidden = true;
+
+            document.getElementById("playAgain").hidden = true;
+            document.getElementById("logout").hidden = true;
+
+
+            //move to betting screen
+            document.getElementById("join").addEventListener("click", function(join){
+                document.getElementById("join").hidden = true;
+                document.getElementById("money").hidden = false;
+                document.getElementById("bet").hidden = false;
+                socket.emit('join');
+            });
+            
+            socket.on('playerMoney',(playerMoney,userId)=>{
+                document.getElementById(userId + ".money").innerHTML = "Bank: $" + playerMoney;
+            });
+
+            document.getElementById("bet").addEventListener("click", function(conti){
+                document.getElementById("bet").disabled = true;
+                var data = document.getElementById("money").value;
+                socket.emit('betting', data);
+            });
+
+            document.getElementById("deal").addEventListener("click", function(conti){
+                socket.emit('singleCard');
+            });
+
+            document.getElementById("stay").addEventListener("click", function(conti){
+                document.getElementById("tisYourTurn").hidden = true;
+
+                document.getElementById("deal").disabled = true;
+                document.getElementById("stay").disabled = true;
+                socket.emit('round');
+            });
+
+            socket.on('badBet', (room)=>{
+                document.getElementById("bet").disabled = false;
+                alert("You have tried to bet more money than you have. Choose a smaller bet and try again.");
+            });
+
+            socket.on('goodBet', (room)=>{
+                document.getElementById("bet").hidden = true;
+                document.getElementById("money").hidden = true;
+                document.getElementById("<User 2>.money").hidden = true;
+                document.getElementById("<User 3>.money").hidden = true;
+                document.getElementById("<User 4>.money").hidden = true;
+                document.getElementById("<User 5>.money").hidden = true;
+                document.getElementById("<User 6>.money").hidden = true;
+
+                document.getElementById("deal").hidden = false;
+                document.getElementById("stay").hidden = false;
+                document.getElementById("split").hidden = false;
+                document.getElementById("cardTable").hidden = false;
+                socket.emit('doubleCards');
+            });
+
+            socket.on('dealerDraw', ()=>{
+                socket.emit('dealerDouble');
+            });
+
+            socket.on('dealersTurn', ()=>{
+                socket.emit('dealerLogic');
+            });
+
+            socket.on('dealersDraw', ()=>{
+                socket.emit('dealerSingle');
+            });
+
+            //starts round robin
+            socket.on('starter', (room)=> {
+                document.getElementById("tisYourTurn").hidden = false;
+                document.getElementById("deal").disabled = false;
+                document.getElementById("stay").disabled = false;
+            });
+
+            //continues round robin
+            socket.on('next', (room)=>{
+                document.getElementById("tisYourTurn").hidden = false;
+                document.getElementById("deal").disabled = false;
+                document.getElementById("stay").disabled = false;
+            });
+
+            socket.on('disSave', (help)=>{
+                socket.emit('round');
+            });
+
+            //displaying cards
+            socket.on('cardDisplay', (newDeal, userId, name, cardTotal)=>{
+                const obj = JSON.parse(newDeal);
+                var div = document.getElementById(userId);
+
+                var total = document.getElementById(userId + ".total").innerHTML = "Total: " + cardTotal;
+                var header = document.createElement('h2');
+                header.textContent = name;
+                div.append(header);
+                for (var i = 0; i < obj.length; i++){
+                    var img = document.createElement('img');
+                    img.src = obj[i].image;
+                    img.style.width = 100 + "px";
+                    img.style.height = 125 + "px";
+                    div.append(img);
+                }
+            });
+
+            socket.on('hitDisplay', (newHit, userId,name,cardTotal)=>{
+                console.log(newHit)
+                const obj1 = JSON.parse(newHit);
+                var div = document.getElementById(userId);
+                var img = document.createElement('img');
+                img.src = obj1.image;
+                img.style.width = 100 + "px";
+                img.style.height = 125 + "px";
+                document.getElementById(userId + ".total").innerText = "Total: " + cardTotal;
+                div.append(img);
+            });
+
+            socket.on('dealerDisplay', (newDeal,dealerCardTotal)=>{
+                const obj = JSON.parse(newDeal);
+                var total = document.getElementById("dealerTotal").innerHTML = "Total: " + dealerCardTotal;
+                for (var i = 0; i < obj.length; i++){
+                    var img = document.createElement('img');
+                    img.src = obj[i].image;
+                    img.style.width = 100 + "px";
+                    img.style.height = 125 + "px";
+                    var div = document.getElementById("dealerCards");
+                    div.append(img);
+                }
+            });
+
+            socket.on('dealerDisplaySingle', (newDHit,dealerCardTotal)=>{
+                const obj1 = JSON.parse(newDHit);
+                console.log(obj1);
+                var img = document.createElement('img');
+                img.src = obj1.image;
+                img.style.width = 100 + "px";
+                img.style.height = 125 + "px";
+                var div = document.getElementById("dealerCards");
+                document.getElementById("dealerTotal").innerHTML = "Total: " + dealerCardTotal;
+                div.append(img);
+            });
+
+            //stuff for split
+            socket.on('splitter', (room)=>{
+                document.getElementById("split").disabled = false;
+            });
+
+            socket.on('splitDisplay', (newDeal, userId, name,cardTotal)=>{
+                document.getElementById(userId).innerHTML = "";
+                obj = JSON.parse(newDeal);
+                var total = document.getElementById(userId + ".total").innerHTML = "Total: " + cardTotal;
+                var img = document.createElement('img');
+                img.src = obj[0].image;
+                img.style.width = 100 + "px";
+                img.style.height = 125 + "px";
+                var div = document.getElementById(userId);
+                var header = document.createElement('h2');
+                header.textContent = name;
+                div.append(header);
+                div.append(img);
+
+                var img1 = document.createElement('img');
+                img1.src = obj[1].image;
+                img1.style.width = 100 + "px";
+                img1.style.height = 125 + "px";
+                var div1 = document.getElementById(userId + ".1");
+                var header1 = document.createElement('h2');
+                header1.textContent = name;
+                div1.append(header1);
+                div1.append(img1);
+            });
+
+            document.getElementById('split').addEventListener('click', function(conti){
+                document.getElementById("split").disabled = true;
+                socket.emit('splitLogic');
+            });
+
+            socket.on('gameOver',()=>{
+                document.getElementById('gameOver').innerHTML = "Game Over!";
+                document.getElementById("tisYourTurn").hidden = true;
+                document.getElementById("playAgain").hidden = false;
+                document.getElementById("stay").disabled = true;
+                document.getElementById("logout").hidden = false;
+
+            });
+            
+            socket.on('burst',()=>{
+                document.getElementById('burst').innerHTML = "Burst!";
+                document.getElementById("playAgain").hidden = false;
+                document.getElementById("logout").hidden = false;
+            });
+        </script>
+    </body>
+</html>
